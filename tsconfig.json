@@ -6,8 +6,6 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "declaration": true,
-    "outDir": "lib",
     "allowJs": true
   },
   "include": ["src/**/*.ts"]

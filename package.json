@@ -2,13 +2,19 @@
   "name": "rwinix",
   "version": "1.0.0",
   "description": "A lib for RWIni parsing",
-  "main": "lib/index.js",
+  "main": "lib/cjs/index.js",
+  "exports": {
+    ".": {
+      "require": "./lib/cjs/index.js",
+      "import": "./lib/es/index.js"
+    }
+  },
   "scripts": {
     "build": "rollup -c",
     "doc": "typedoc src/index.ts",
     "peggy-rwini": "peggy src/peggy/rwini.peggy -o src/peggy/rwiniParser.ts --cache --format es",
     "peggy-expr": "peggy src/peggy/expr.peggy -o src/peggy/exprParser.ts --cache --format es",
-    "lint": "eslint",
+    "lint": "eslint src --ext ts --report-unused-disable-directives --max-warnings 0",
     "test": "jest"
   },
   "keywords": [],
@@ -17,9 +23,12 @@
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
     "@babel/core": "^7.22.9",
+    "@babel/plugin-transform-runtime": "^7.22.9",
     "@babel/preset-env": "^7.22.9",
+    "@babel/preset-typescript": "^7.22.5",
     "@jest/globals": "^29.6.2",
     "@rollup/plugin-babel": "^6.0.3",
+    "@rollup/plugin-commonjs": "^25.0.3",
     "@rollup/plugin-node-resolve": "^15.1.0",
     "@rollup/plugin-terser": "^0.4.3",
     "@rollup/plugin-typescript": "^11.1.2",
