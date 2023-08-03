@@ -2,18 +2,18 @@ import { Source } from './source'
 import { ASTNode, Parser } from './parser'
 
 export interface Transformer<
-  Input extends (ASTNode | unknown) = ASTNode, 
-  Output extends (ASTNode | unknown) = ASTNode,
-  SourceContent extends unknown = string,
+  Input = ASTNode,
+  Output = ASTNode,
+  SourceContent = string,
 > {
-  (tree: Input, source: Source<SourceContent>): Output
+  (input: Input, source: Source<SourceContent>): Output
 }
 
 export interface Plugin<
-  Options extends object = {}, 
-  Input extends (ASTNode | unknown) = ASTNode, 
-  Output extends (ASTNode | unknown) = ASTNode,
-  SourceContent extends unknown = string,
+  Options extends object = {},
+  Input = ASTNode,
+  Output = ASTNode,
+  SourceContent = string,
 > {
   (options?: Options): Transformer<Input, Output, SourceContent>
 }

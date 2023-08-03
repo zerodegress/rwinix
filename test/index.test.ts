@@ -2,18 +2,11 @@ import { describe, expect, test } from '@jest/globals'
 import { parse } from '../src/rwini'
 import rwini from '../src'
 import { Position } from '../src/parser'
+import { createSource } from '../src/source'
 
 describe('object "rwini" works', () => {
   test('simple test', () => {
-    expect(rwini().process({
-      filename: undefined,
-      fullpath: undefined,
-      content: '[abc]',
-      length: 5,
-      locate: function (offset: number): Position {
-        throw new Error('Function not implemented.')
-      }
-    })).toEqual({
+    expect(rwini().process(createSource('[abc]'))).toEqual({
       nodeType: 'rwini',
       blocks: [
         {
