@@ -4,11 +4,28 @@
     ...options.escapeMap,
   }
   options.allowAssign = options.allowAssign || false
+  options.allowList = options.allowList || false
   options.errors = {
     'expr.invalid': 'Invalid exprresion.',
+    'assign.diabled': 'options.allowAssign has been set to false.',
+    'expr.list.disabled': 'options.allowList has been set to false',
     ...options.errors,
   }
 }
+
+ExprList
+  = head:Expr tail:(WhiteSpace ',' WhiteSpace @ExprList)* {
+    if(tail) {
+      if(!options.allowList) {
+        return error(options.errors['expr.list.disabled'])
+      }
+      return {
+        nodeType: 'expr_list',
+        exprs: [head, ...tail]
+      }
+    }
+    return head
+  }
 
 Expr
   = WhiteSpace expr:AssignExpr WhiteSpace {
@@ -22,20 +39,62 @@ NoWhiteSpaceAroundExpr
   = expr:AssignExpr {
     return expr
   }
-  
+
 AssignExpr
-  = left:OrExpr right:(WhiteSpace '=' @WhiteSpace AssignExpr)? {
-    if(!right) {
-      return left
-    } else {
-      return {
-        nodeType: 'expr_assign',
-        left,
-        right,
-      }
+  = left:OrExpr right:(WhiteSpace '=' WhiteSpace @AssignExpr) {
+    if(!options.allowAssign) {
+      error(options.errors['assign.diabled'])
+    }
+    return {
+      nodeType: 'expr_assign',
+      left,
+      right,
     }
   }
-  
+  / left:OrExpr right:(WhiteSpace '+=' WhiteSpace @AssignExpr) {
+    if(!options.allowAssign) {
+      error(options.errors['assign.diabled'])
+    }
+    return {
+      nodeType: 'expr_add_assign',
+      left,
+      right,
+    }
+  }
+  / left:OrExpr right:(WhiteSpace '-=' WhiteSpace @AssignExpr) {
+    if(!options.allowAssign) {
+      error(options.errors['assign.diabled'])
+    }
+    return {
+      nodeType: 'expr_sub_assign',
+      left,
+      right,
+    }
+  }
+  / left:OrExpr right:(WhiteSpace '*=' WhiteSpace @AssignExpr) {
+    if(!options.allowAssign) {
+      error(options.errors['assign.diabled'])
+    }
+    return {
+      nodeType: 'expr_mul_assign',
+      left,
+      right,
+    }
+  }
+  / left:OrExpr right:(WhiteSpace '/=' WhiteSpace @AssignExpr) {
+    if(!options.allowAssign) {
+      error(options.errors['assign.diabled'])
+    }
+    return {
+      nodeType: 'expr_div_assign',
+      left,
+      right,
+    }
+  }
+  / node:OrExpr {
+    return node
+  }
+
 OrExpr
   = head:AndExpr tail:(WordSep 'or' WordSep @OrExpr)+ {
     return {
@@ -57,53 +116,59 @@ AndExpr
   / node:EqExpr {
     return node
   }
-  
+
 EqExpr
-  = head:CompareExpr tail:(WhiteSpace '==' WhiteSpace @EqExpr)+ {
+  = left:CompareExpr right:(WhiteSpace '==' WhiteSpace @EqExpr) {
     return {
       nodeType: 'expr_eq',
-      values: [head, ...tail]
+      left,
+      right,
     }
   }
-  / head:CompareExpr tail:(WhiteSpace '!=' WhiteSpace @EqExpr)+ {
+  / left:CompareExpr right:(WhiteSpace '!=' WhiteSpace @EqExpr) {
     return {
       nodeType: 'expr_ne',
-      values: [head, ...tail]
+      left,
+      right,
     }
   }
   / node:CompareExpr {
     return node
   }
-  
+
 CompareExpr
-  = head:AddExpr tail:(WhiteSpace '>=' WhiteSpace @CompareExpr)+ {
+  = left:AddExpr right:(WhiteSpace '>=' WhiteSpace @CompareExpr) {
     return {
       nodeType: 'expr_ge',
-      values: [head, ...tail]
+      left,
+      right,
     }
   }
-  / head:AddExpr tail:(WhiteSpace '>' WhiteSpace @CompareExpr)+ {
+  / left:AddExpr right:(WhiteSpace '>' WhiteSpace @CompareExpr) {
     return {
       nodeType: 'expr_gt',
-      values: [head, ...tail]
+      left,
+      right,
     }
   }
-  / head:AddExpr tail:(WhiteSpace '<=' WhiteSpace @CompareExpr)+ {
+  / left:AddExpr right:(WhiteSpace '<=' WhiteSpace @CompareExpr) {
     return {
       nodeType: 'expr_le',
-      values: [head, ...tail]
+      left,
+      right,
     }
   }
-  / head:AddExpr tail:(WhiteSpace '<' WhiteSpace @CompareExpr)+ {
+  / left:AddExpr right:(WhiteSpace '<' WhiteSpace @CompareExpr) {
     return {
       nodeType: 'expr_lt',
-      values: [head, ...tail]
+      left,
+      right,
     }
   }
   / node:AddExpr {
     return node
   }
-  
+
 AddExpr
   = head:MulExpr tail:(WhiteSpace '+' WhiteSpace @AddExpr)+ {
     return {
@@ -134,6 +199,12 @@ MulExpr
       values: [head, ...tail]
     }
   }
+  / head:SingleExpr tail:(WhiteSpace '%' WhiteSpace @MulExpr)+ {
+    return {
+      nodeType: 'expr_mod',
+      values: [head, ...tail]
+    }
+  }
   / node:SingleExpr {
     return node
   }
@@ -148,7 +219,7 @@ SingleExpr
   / node:SufExpr {
     return node
   }
-  
+
 SufExpr
   = func:ParrenExpr '(' WhiteSpace list:ParamList? WhiteSpace ')' {
     return {
@@ -174,7 +245,7 @@ SufExpr
   / node:ParrenExpr {
     return node
   }
-  
+
 ParrenExpr
   = '(' WhiteSpace expr:NoWhiteSpaceAroundExpr WhiteSpace ')' {
     return expr
@@ -182,7 +253,7 @@ ParrenExpr
   / node:MetaExpr {
     return node
   }
-  
+
 MetaExpr
   = node:Literal {
     return node
@@ -210,7 +281,7 @@ Param
       value,
     }
   }
-  
+
 Identifier
   = value:$([^- \n\t\+\*\/&^%$#@!\\|'";:\?\.\[\]\{\}`~\(\)\=,0-9] [^- \n\t\+\*\/&^%$#@!\\|'";:\?\.\[\]\{\}`~\(\)\=,]*) {
     return {
@@ -218,7 +289,7 @@ Identifier
       value,
     }
   }
-  
+
 Literal
   = value:NumberLiteral {
     return {
@@ -244,11 +315,11 @@ Literal
       value,
     }
   }
-  
+
 NumberLiteral
   = IntegerLiteral
   / FloatLiteral
-  
+
 IntegerLiteral
   = $(('+' / '-')? [1-9] [0-9]*)
   / $(('+' / '-')? [0-9])
@@ -281,6 +352,6 @@ NullLiteral
 
 WhiteSpace
   = [ \t\n]*
-  
+
 WordSep
   = [ \t\n]+

@@ -10,13 +10,10 @@ export type RwiniASTNodeType =
   | 'section_item'
   | 'attribute'
 
-export interface RwiniASTNode<Type extends RwiniASTNodeType = RwiniASTNodeType> extends ASTNode<Type> {
-  nodeType: Type
-  location: Range
-}
+export interface RwiniASTNode<Type extends RwiniASTNodeType = RwiniASTNodeType> extends ASTNode<Type> {}
 
 export interface RwiniSource extends RwiniASTNode<'rwini'> {
-  blocks: CommentBlock | CommentLine | Section
+  blocks: (CommentBlock | CommentLine | Section)[]
 }
 
 export interface CommentBlock extends RwiniASTNode<'comment_block'> {
@@ -42,13 +39,33 @@ export interface Attribute extends RwiniASTNode<'attribute'> {
   key: string
   value: string
 }
- 
-export type RwiniParser = Parser<RwiniASTNodeType, RwiniSource>
+
+export interface AttributeStandard extends RwiniASTNode<'attribute'> {
+  key: string
+  value: string
+}
+
+export type RwiniParserOptions = {
+
+}
+
+export type RwiniParser = Parser<RwiniASTNodeType, RwiniSource, RwiniParserOptions>
 
 export const parse: RwiniParser = parseRwini
 
-export const core: Plugin<{}, undefined, RwiniSource, string> = () => {
+export type CorePluginOptions = {
+  disableCore: boolean
+  peggy: RwiniParserOptions
+}
+
+export const core: Plugin<CorePluginOptions, undefined, RwiniSource, string> = options => {
   return (input, source) => {
-    return parse(source.content)
+    if(options?.disableCore) {
+      return {
+        nodeType: 'rwini',
+        blocks: [] as (CommentBlock | CommentLine | Section)[]
+      } as RwiniSource
+    }
+    return parse(source.content, options?.peggy)
   }
 }
