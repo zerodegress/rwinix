@@ -1,7 +1,7 @@
-import { Position } from "./parser"
+import { Position } from './parser'
 import path from 'path-browserify'
 
-export interface Source<Content extends unknown = string> {
+export interface Source<Content = string> {
   filename?: string
   fullpath?: string
   content: Content
@@ -10,7 +10,7 @@ export interface Source<Content extends unknown = string> {
 }
 
 export function createSource<
-  Content extends unknown = string
+  Content = string
 >(content: Content, options?: {
   fullpath?: string
   length?: number
@@ -20,10 +20,10 @@ export function createSource<
     filename: options?.fullpath && path.basename(options.fullpath),
     fullpath: options?.fullpath,
     content,
-    length: options?.length 
-      || (typeof content == 'string' && content.length) 
+    length: options?.length
+      || (typeof content == 'string' && content.length)
       || 0,
-    locate: options?.locate 
+    locate: options?.locate
       || (typeof content == 'string' && ((offset) => {
         const slice = content.slice(0, offset)
         const line = (slice.match(/\n/)?.length || 0) + 1

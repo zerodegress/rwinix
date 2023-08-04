@@ -32,7 +32,7 @@ export type ExprASTNodeType =
   | 'expr_mul_assign'
   | 'expr_div_assign'
 
-export interface ExprASTNode<NodeType extends ExprASTNodeType = ExprASTNodeType> extends ASTNode<NodeType> { }
+export type ExprASTNode<NodeType extends ExprASTNodeType = ExprASTNodeType> = ASTNode<NodeType>
 
 export type Expr =
   | ExprAssign
@@ -69,20 +69,20 @@ export interface ExprAssign<Type extends | 'expr_assign'
   right: Expr
 }
 
-export interface ExprAddAssign extends ExprAssign<'expr_add_assign'> { }
+export type ExprAddAssign = ExprAssign<'expr_add_assign'>
 
-export interface ExprSubAssign extends ExprAssign<'expr_sub_assign'> { }
+export type ExprSubAssign = ExprAssign<'expr_sub_assign'>
 
-export interface ExprMulAssign extends ExprAssign<'expr_mul_assign'> { }
+export type ExprMulAssign = ExprAssign<'expr_mul_assign'>
 
-export interface ExprDivAssign extends ExprAssign<'expr_div_assign'> { }
+export type ExprDivAssign = ExprAssign<'expr_div_assign'>
 
 export interface ExprEq<Type extends 'expr_ne' | 'expr_eq' = 'expr_eq'> extends ExprASTNode<Type> {
   left: Expr
   right: Expr
 }
 
-export interface ExprNe extends ExprEq<'expr_ne'> { }
+export type ExprNe = ExprEq<'expr_ne'>
 
 export interface ExprCompare<Type extends
   | 'expr_lt'
@@ -94,13 +94,13 @@ export interface ExprCompare<Type extends
   right: Expr
 }
 
-export interface ExprLt extends ExprCompare<'expr_lt'> { }
+export type ExprLt = ExprCompare<'expr_lt'>
 
-export interface ExprLe extends ExprCompare<'expr_le'> { }
+export type ExprLe = ExprCompare<'expr_le'>
 
-export interface ExprGt extends ExprCompare<'expr_gt'> { }
+export type ExprGt = ExprCompare<'expr_gt'>
 
-export interface ExprGe extends ExprCompare<'expr_ge'> { }
+export type ExprGe = ExprCompare<'expr_ge'>
 
 export interface ExprCompute<Type extends
   | 'expr_div'
@@ -112,15 +112,15 @@ export interface ExprCompute<Type extends
   values: Expr[]
 }
 
-export interface ExprAdd extends ExprCompute<'expr_add'> { }
+export type ExprAdd = ExprCompute<'expr_add'>
 
-export interface ExprSub extends ExprCompute<'expr_sub'> { }
+export type ExprSub = ExprCompute<'expr_sub'>
 
-export interface ExprMul extends ExprCompute<'expr_mul'> { }
+export type ExprMul = ExprCompute<'expr_mul'>
 
-export interface ExprDiv extends ExprCompute<'expr_div'> { }
+export type ExprDiv = ExprCompute<'expr_div'>
 
-export interface ExprMod extends ExprCompute<'expr_mod'> { }
+export type ExprMod = ExprCompute<'expr_mod'>
 
 export interface FuncCall extends ExprASTNode<'func_call'> {
   func: ExprASTNode
@@ -155,16 +155,16 @@ export interface Literal<Type extends
   value: string
 }
 
-export interface LiteralString extends Literal<'literal_string'> { }
+export type LiteralString = Literal<'literal_string'>
 
-export interface LiteralNumber extends Literal<'literal_number'> { }
+export type LiteralNumber = Literal<'literal_number'>
 
-export interface LiteralNull extends Literal<'literal_null'> { }
+export type LiteralNull = Literal<'literal_null'>
 
-export interface LiteralBoolean extends Literal<'literal_boolean'> { }
+export type LiteralBoolean = Literal<'literal_boolean'>
 
 export type ExprParserOptions = {
-
+  // TODO
 }
 
 export type ExprParser = Parser<ExprASTNodeType, Expr, ExprParserOptions>

@@ -15,9 +15,9 @@ export interface ASTNode<NodeType extends string = string> {
 }
 
 export interface Parser<
-  NodeType extends string, 
+  NodeType extends string,
   Root extends ASTNode<NodeType> = ASTNode<NodeType>,
-  Options extends object = {}
+  Options extends object = Record<string, never>
 > {
   (input: string, options?: Options): Root
 }

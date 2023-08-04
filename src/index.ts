@@ -1,14 +1,13 @@
-import { Plugin, Transformer } from "./plugin"
-import { CorePluginOptions, RwiniSource, core } from "./rwini"
-import { Source } from "./source"
-import { parse as rwiniParser } from './rwini'
+import { Plugin } from './plugin'
+import { CorePluginOptions, core } from './rwini'
+import { Source } from './source'
 
 export interface Processor<
-  SourceInput extends unknown,
-  CurrentOutput extends unknown,
+  SourceInput,
+  CurrentOutput
 > {
   use: <
-    Output extends unknown,
+    Output,
     Options extends object
   >(
     plugin: Plugin<object, CurrentOutput, Output, SourceInput>,
@@ -18,16 +17,16 @@ export interface Processor<
 }
 
 export interface ProcessorFactory<
-  Source extends unknown = undefined,
-  Options extends object = {},
+  Source = undefined,
+  Options extends object = Record<string, never>,
 > {
   (options?: Options): Processor<Source, string>
 }
 
 function createProcessor<
-  Output extends unknown,
-  SourceInput extends unknown,
-  CurrentOutput extends unknown,
+  Output,
+  SourceInput,
+  CurrentOutput,
   Options extends object
 >(
   preProcess: (input: Source<SourceInput>) => CurrentOutput,
@@ -59,7 +58,7 @@ export interface RwIniOptions {
   core: CorePluginOptions
 }
 export const rwini = (options?: RwIniOptions) => createProcessor(
-  (input: Source<string>) => undefined,
+  () => undefined,
   core,
   options?.core,
 )

@@ -1,4 +1,3 @@
-import 'rollup'
 import nodeResolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 import babel from '@rollup/plugin-babel'
@@ -10,7 +9,7 @@ export default [
   {
     input: 'src/index.ts',
     output: {
-      file: 'lib/cjs/index.js',
+      file: 'dist/rwinix-cjs.js',
       format: 'cjs',
       name: 'rwinix',
       exports: 'named'
@@ -23,15 +22,25 @@ export default [
       }),
       typescript({
         declaration: true,
-        outDir: 'lib/types',
+        outDir: 'types',
         emitDeclarationOnly: true,
       }),
     ]
   },
   {
+    input: 'dist/rwinix-cjs.js',
+    output: {
+      file: 'dist/rwinix-cjs.min.js',
+      format: 'cjs',
+      name: 'rwinix',
+      exports: 'named'
+    },
+    plugins: [terser()]
+  },
+  {
     input: 'src/index.ts',
     output: {
-      file: 'lib/es/index.js',
+      file: 'dist/rwinix-es.js',
       format: 'es',
       name: 'rwinix',
       exports: 'named'
@@ -44,9 +53,19 @@ export default [
       }),
       typescript({
         declaration: true,
-        outDir: 'lib/types',
+        outDir: 'types',
         emitDeclarationOnly: true,
       }),
     ]
-  }
+  },
+  {
+    input: 'dist/rwinix-es.js',
+    output: {
+      file: 'dist/rwinix-es.min.js',
+      format: 'es',
+      name: 'rwinix',
+      exports: 'named'
+    },
+    plugins: [terser()]
+  },
 ]

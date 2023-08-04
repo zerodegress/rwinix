@@ -1,5 +1,5 @@
 import { parse as parseRwini} from './peggy/rwiniParser'
-import { ASTNode, Parser, Range } from './parser'
+import { ASTNode, Parser } from './parser'
 import { Plugin } from './plugin'
 
 export type RwiniASTNodeType =
@@ -10,7 +10,7 @@ export type RwiniASTNodeType =
   | 'section_item'
   | 'attribute'
 
-export interface RwiniASTNode<Type extends RwiniASTNodeType = RwiniASTNodeType> extends ASTNode<Type> {}
+export type RwiniASTNode<Type extends RwiniASTNodeType = RwiniASTNodeType> = ASTNode<Type>
 
 export interface RwiniSource extends RwiniASTNode<'rwini'> {
   blocks: (CommentBlock | CommentLine | Section)[]
@@ -46,7 +46,7 @@ export interface AttributeStandard extends RwiniASTNode<'attribute'> {
 }
 
 export type RwiniParserOptions = {
-
+  // TODO
 }
 
 export type RwiniParser = Parser<RwiniASTNodeType, RwiniSource, RwiniParserOptions>

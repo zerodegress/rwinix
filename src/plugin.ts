@@ -1,5 +1,5 @@
 import { Source } from './source'
-import { ASTNode, Parser } from './parser'
+import { ASTNode } from './parser'
 
 export interface Transformer<
   Input = ASTNode,
@@ -10,7 +10,7 @@ export interface Transformer<
 }
 
 export interface Plugin<
-  Options extends object = {},
+  Options extends object = Record<string, never>,
   Input = ASTNode,
   Output = ASTNode,
   SourceContent = string,
