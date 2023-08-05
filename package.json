@@ -1,8 +1,9 @@
 {
   "name": "rwinix",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A lib for RWIni parsing",
   "main": "dist/rwinix-cs",
+  "types": "dist/types/index.d.ts",
   "exports": {
     ".": {
       "require": "./dist/rwinix-cjs.js",
