@@ -1,5 +1,5 @@
 import { describe, expect, test } from '@jest/globals'
-import rwini from '../src'
+import rwini, { expr } from '../src'
 import { createSource } from '../src/source'
 
 describe('object "rwini" works', () => {
@@ -26,5 +26,8 @@ describe('object "rwini" works', () => {
         }
       ]
     })
+    rwini({ disableCore: true })
+      .use(expr)
+      .process(createSource('parent.readUnitMemory("a",type="b")'))
   })
 })

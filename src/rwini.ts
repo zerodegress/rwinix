@@ -54,8 +54,8 @@ export type RwiniParser = Parser<RwiniASTNodeType, RwiniSource, RwiniParserOptio
 export const parse: RwiniParser = parseRwini
 
 export type CorePluginOptions = {
-  disableCore: boolean
-  peggy: RwiniParserOptions
+  disableCore?: boolean
+  peggy?: RwiniParserOptions
 }
 
 export const core: Plugin<CorePluginOptions, undefined, RwiniSource, string> = options => {

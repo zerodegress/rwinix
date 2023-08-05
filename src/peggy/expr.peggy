@@ -13,20 +13,6 @@
   }
 }
 
-ExprList
-  = head:Expr tail:(WhiteSpace ',' WhiteSpace @ExprList)* {
-    if(tail) {
-      if(!options.allowList) {
-        return error(options.errors['expr.list.disabled'])
-      }
-      return {
-        nodeType: 'expr_list',
-        exprs: [head, ...tail]
-      }
-    }
-    return head
-  }
-
 Expr
   = WhiteSpace expr:AssignExpr WhiteSpace {
     return expr
@@ -40,6 +26,21 @@ NoWhiteSpaceAroundExpr
     return expr
   }
 
+ExprList
+  = head:AssignExpr tail:(WhiteSpace ',' WhiteSpace @ExprList)* {
+    if(tail) {
+      if(!options.allowList) {
+        return error(options.errors['expr.list.disabled'])
+      }
+      return {
+        nodeType: 'expr_list',
+        exprs: [head, ...tail],
+        location: location(),
+      }
+    }
+    return head
+  }
+
 AssignExpr
   = left:OrExpr right:(WhiteSpace '=' WhiteSpace @AssignExpr) {
     if(!options.allowAssign) {
@@ -49,6 +50,7 @@ AssignExpr
       nodeType: 'expr_assign',
       left,
       right,
+      location: location(),
     }
   }
   / left:OrExpr right:(WhiteSpace '+=' WhiteSpace @AssignExpr) {
@@ -59,6 +61,7 @@ AssignExpr
       nodeType: 'expr_add_assign',
       left,
       right,
+      location: location(),
     }
   }
   / left:OrExpr right:(WhiteSpace '-=' WhiteSpace @AssignExpr) {
@@ -69,6 +72,7 @@ AssignExpr
       nodeType: 'expr_sub_assign',
       left,
       right,
+      location: location(),
     }
   }
   / left:OrExpr right:(WhiteSpace '*=' WhiteSpace @AssignExpr) {
@@ -79,6 +83,7 @@ AssignExpr
       nodeType: 'expr_mul_assign',
       left,
       right,
+      location: location(),
     }
   }
   / left:OrExpr right:(WhiteSpace '/=' WhiteSpace @AssignExpr) {
@@ -89,6 +94,7 @@ AssignExpr
       nodeType: 'expr_div_assign',
       left,
       right,
+      location: location(),
     }
   }
   / node:OrExpr {
@@ -99,7 +105,8 @@ OrExpr
   = head:AndExpr tail:(WordSep 'or' WordSep @OrExpr)+ {
     return {
       nodeType: 'expr_or',
-      values: [head, ...tail]
+      values: [head, ...tail],
+      location: location(),
     }
   }
   / node:AndExpr {
@@ -110,7 +117,8 @@ AndExpr
   = head:EqExpr tail:(WordSep 'and' WordSep @AndExpr)+ {
     return {
       nodeType: 'expr_and',
-      values: [head, ...tail]
+      values: [head, ...tail],
+      location: location(),
     }
   }
   / node:EqExpr {
@@ -123,6 +131,7 @@ EqExpr
       nodeType: 'expr_eq',
       left,
       right,
+      location: location(),
     }
   }
   / left:CompareExpr right:(WhiteSpace '!=' WhiteSpace @EqExpr) {
@@ -130,6 +139,7 @@ EqExpr
       nodeType: 'expr_ne',
       left,
       right,
+      location: location(),
     }
   }
   / node:CompareExpr {
@@ -142,6 +152,7 @@ CompareExpr
       nodeType: 'expr_ge',
       left,
       right,
+      location: location(),
     }
   }
   / left:AddExpr right:(WhiteSpace '>' WhiteSpace @CompareExpr) {
@@ -149,6 +160,7 @@ CompareExpr
       nodeType: 'expr_gt',
       left,
       right,
+      location: location(),
     }
   }
   / left:AddExpr right:(WhiteSpace '<=' WhiteSpace @CompareExpr) {
@@ -156,6 +168,7 @@ CompareExpr
       nodeType: 'expr_le',
       left,
       right,
+      location: location(),
     }
   }
   / left:AddExpr right:(WhiteSpace '<' WhiteSpace @CompareExpr) {
@@ -163,6 +176,7 @@ CompareExpr
       nodeType: 'expr_lt',
       left,
       right,
+      location: location(),
     }
   }
   / node:AddExpr {
@@ -173,13 +187,15 @@ AddExpr
   = head:MulExpr tail:(WhiteSpace '+' WhiteSpace @AddExpr)+ {
     return {
       nodeType: 'expr_add',
-      values: [head, ...tail]
+      values: [head, ...tail],
+      location: location(),
     }
   }
   / head:MulExpr tail:(WhiteSpace '-' WhiteSpace @AddExpr)+ {
     return {
       nodeType: 'expr_sub',
-      values: [head, ...tail]
+      values: [head, ...tail],
+      location: location(),
     }
   }
   / node:MulExpr {
@@ -190,19 +206,22 @@ MulExpr
   = head:SingleExpr tail:(WhiteSpace '*' WhiteSpace @MulExpr)+ {
     return {
       nodeType: 'expr_mul',
-      values: [head, ...tail]
+      values: [head, ...tail],
+      location: location(),
     }
   }
   / head:SingleExpr tail:(WhiteSpace '/' WhiteSpace @MulExpr)+ {
     return {
       nodeType: 'expr_div',
-      values: [head, ...tail]
+      values: [head, ...tail],
+      location: location(),
     }
   }
   / head:SingleExpr tail:(WhiteSpace '%' WhiteSpace @MulExpr)+ {
     return {
       nodeType: 'expr_mod',
-      values: [head, ...tail]
+      values: [head, ...tail],
+      location: location(),
     }
   }
   / node:SingleExpr {
@@ -214,6 +233,7 @@ SingleExpr
     return {
       nodeType: 'expr_not',
       expr,
+      location: location(),
     }
   }
   / node:SufExpr {
@@ -226,6 +246,7 @@ SufExpr
       nodeType: 'func_call',
       func,
       params: list || [],
+      location: location(),
     }
   }
   / arr:ParrenExpr '[' WhiteSpace index:Expr WhiteSpace ']' {
@@ -233,6 +254,7 @@ SufExpr
       nodeType: 'arr_index',
       arr,
       index,
+      location: location(),
     }
   }
   / obj:ParrenExpr '.' member:NoWhiteSpaceAroundExpr {
@@ -240,6 +262,7 @@ SufExpr
       nodeType: 'obj_member',
       obj,
       member,
+      location: location(),
     }
   }
   / node:ParrenExpr {
@@ -273,12 +296,14 @@ Param
       nodeType: 'param',
       key,
       value,
+      location: location(),
     }
   }
   / value:NoWhiteSpaceAroundExpr {
     return {
       nodeType: 'param',
       value,
+      location: location(),
     }
   }
 
@@ -287,6 +312,7 @@ Identifier
     return {
       nodeType: 'identifier',
       value,
+      location: location(),
     }
   }
 
@@ -295,24 +321,28 @@ Literal
     return {
       nodeType: 'literal_number',
       value,
+      location: location(),
     }
   }
   / value:StringLiteral {
     return {
       nodeType: 'literal_string',
       value,
+      location: location(),
     }
   }
   / value:BooleanLiteral {
     return {
       nodeType: 'literal_boolean',
       value,
+      location: location(),
     }
   }
   / value:NullLiteral {
     return {
       nodeType: 'literal_null',
       value,
+      location: location(),
     }
   }
 

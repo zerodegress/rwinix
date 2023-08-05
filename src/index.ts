@@ -55,12 +55,20 @@ function createProcessor<
 }
 
 export interface RwIniOptions {
-  core: CorePluginOptions
+  core?: CorePluginOptions
+  disableCore?: boolean
 }
 export const rwini = (options?: RwIniOptions) => createProcessor(
   () => undefined,
   core,
-  options?.core,
+  {
+    disableCore: options?.disableCore,
+    ...options?.core,
+  },
 )
 
 export default rwini
+
+export { core } from './rwini'
+
+export { expr } from './expr'

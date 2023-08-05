@@ -172,10 +172,10 @@ export type ExprParser = Parser<ExprASTNodeType, Expr, ExprParserOptions>
 export const parse: ExprParser = parseExpr
 
 export type ExprPluginOptions = {
-  peggy: ExprParserOptions
+  peggy?: ExprParserOptions
 }
 
-export const expr: Plugin<ExprPluginOptions, undefined, Expr, string> = (options) => {
+export const expr: Plugin<ExprPluginOptions, unknown, Expr, string> = (options) => {
   return (input, source) => {
     return parse(source.content, options?.peggy)
   }
